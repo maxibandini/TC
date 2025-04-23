@@ -102,6 +102,14 @@ public class MiniLenguajeParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_program; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniLenguajeListener ) ((MiniLenguajeListener)listener).enterProgram(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniLenguajeListener ) ((MiniLenguajeListener)listener).exitProgram(this);
+		}
 	}
 
 	public final ProgramContext program() throws RecognitionException {
@@ -152,6 +160,14 @@ public class MiniLenguajeParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_token; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniLenguajeListener ) ((MiniLenguajeListener)listener).enterToken(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniLenguajeListener ) ((MiniLenguajeListener)listener).exitToken(this);
+		}
 	}
 
 	public final TokenContext token() throws RecognitionException {

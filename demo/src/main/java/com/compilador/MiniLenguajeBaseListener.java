@@ -16,13 +16,13 @@ public class MiniLenguajeBaseListener implements MiniLenguajeListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterProgram(MiniLenguajeParser.ProgramContext ctx) { }
+	@Override public void enterPrograma(MiniLenguajeParser.ProgramaContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitProgram(MiniLenguajeParser.ProgramContext ctx) { }
+	@Override public void exitPrograma(MiniLenguajeParser.ProgramaContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

@@ -1,28 +1,65 @@
 grammar MiniLenguaje;
 
-// Reglas del parser (simplificadas)
-program : token* EOF ;
-token   : ID | INTEGER | STRING | KEYWORD | OPERATOR | SEPARATOR ;
+programa : (token)* EOF ;
 
-// Lexer rules (reglas léxicas)
-// Identificadores
-ID          : [a-zA-Z][a-zA-Z0-9_]* ;
+token : PA | PC | CA | CC | LA | LC | PYC | COMA | IGUAL | MAYOR | MAYOR_IGUAL 
+      | MENOR | MENOR_IGUAL | EQL | DISTINTO | SUM | RES | MUL | DIV | MOD
+      | OR | AND | NOT | FOR | WHILE | IF | ELSE | INT | CHAR | DOUBLE | VOID
+      | RETURN | ID | INTEGER | DECIMAL | CHARACTER | OTRO ;
 
-// Literales
-INTEGER     : [0-9]+ ;
-STRING      : '"' (~["\r\n] | '\\"')* '"' ;
-BOOLEAN     : 'true' | 'false' ;
+fragment LETRA : [A-Za-z];
+fragment DIGITO : [0-9];
 
-// Palabras clave
-KEYWORD     : 'var' | 'if' | 'else' | 'print' | 'while' | 'function' | 'return' ;
+PA   : '(' ;
+PC   : ')' ;
+CA   : '[' ;
+CC   : ']' ;
+LA   : '{' ;
+LC   : '}' ;
 
-// Operadores
-OPERATOR    : '+' | '-' | '*' | '/' | '%' | '=' | '==' | '!=' | '<' | '>' | '<=' | '>=' | '&&' | '||' | '!' ;
+PYC  : ';' ;
+COMA : ',' ;
 
-// Separadores
-SEPARATOR   : ';' | '(' | ')' | '{' | '}' | ',' | '.' ;
+IGUAL : '=' ;
 
-// Ignorar espacios en blanco y comentarios
-WS          : [ \t\r\n]+ -> skip ;
-COMMENT     : '//' ~[\r\n]* -> skip ;
-BLOCK_COMMENT : '/*' .*? '*/' -> skip ;
+MAYOR  : '>' ;
+MAYOR_IGUAL: '>=' ;
+MENOR  : '<' ;
+MENOR_IGUAL: '<=' ;
+EQL  : '==' ;
+DISTINTO  : '!=' ;
+
+SUM  : '+' ;
+RES  : '-' ;
+MUL  : '*' ;
+DIV  : '/' ;
+MOD  : '%' ;
+
+OR   : '||' ;
+AND  : '&&' ;
+NOT  : '!' ;
+
+FOR  : 'for' ;
+WHILE: 'while' ;
+
+IF   : 'if' ;
+ELSE : 'else' ;
+
+INT     : 'int' ;
+CHAR    : 'char' ;
+DOUBLE  : 'double' ;
+VOID    : 'void' ;
+
+RETURN : 'return' ;
+
+ID : (LETRA | '_') (LETRA | DIGITO | '_')* ;
+
+INTEGER : DIGITO+ ;
+DECIMAL : INTEGER '.' INTEGER ;
+CHARACTER: '\'' (~['\r\n] | '\\' .) '\'' ;
+
+COMENTARIO_LINEA : '//' ~[\r\n]* -> skip ;
+COMENTARIO_BLOQUE : '/*' .*? '*/' -> skip ;
+
+WS : [ \r\n\t] -> skip ;
+OTRO : . ;

@@ -31,9 +31,9 @@ CharStream inputSintactico = CharStreams.fromFileName(args[0]);
 realizarAnalisisSintactico(inputSintactico);
             
         } catch (IOException e) {
-            System.err.println("❌ Error al leer el archivo: " + e.getMessage());
+            System.err.println(" Error al leer el archivo: " + e.getMessage());
         } catch (Exception e) {
-            System.err.println("❌ Error inesperado: " + e.getMessage());
+            System.err.println(" Error inesperado: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -75,10 +75,10 @@ realizarAnalisisSintactico(inputSintactico);
                 }
             }
             
-            System.out.println("\n✅ Análisis léxico completado sin errores.");
+            System.out.println("\nAnálisis léxico completado sin errores.");
             
         } catch (ParseCancellationException e) {
-            System.out.println("\n❌ " + e.getMessage());
+            System.out.println("\n" + e.getMessage());
             
             // Mostrar contexto del error (opcional)
             String[] lineas = input.toString().split("\n");
@@ -128,7 +128,7 @@ realizarAnalisisSintactico(inputSintactico);
             // Intentar analizar como expresión
             ParseTree tree = parser.expr();
             
-            System.out.println("\n✅ Análisis sintáctico completado sin errores.");
+            System.out.println("\n Análisis sintáctico completado sin errores.");
             System.out.println("Representación textual del árbol sintáctico:");
             System.out.println(tree.toStringTree(parser));
             
@@ -141,7 +141,7 @@ realizarAnalisisSintactico(inputSintactico);
             mostrarArbolGrafico(tree, parser);
             
         } catch (ParseCancellationException e) {
-            System.out.println("\n❌ " + e.getMessage());
+            System.out.println("\n " + e.getMessage());
             System.out.println("El archivo no pudo ser analizado como una expresión aritmética válida.");
             
             // Intento alternativo: analizar como programa general
@@ -150,12 +150,18 @@ realizarAnalisisSintactico(inputSintactico);
                 tokens.seek(0);
                 parser.reset();
                 
-                System.out.println("\nIntentando analizar como programa general...");
+                System.out.println("\n Intentando analizar como programa general...");
                 ParseTree tree = parser.programa();
                 
-                System.out.println("✅ Análisis como programa general completado sin errores.");
+                System.out.println(" Análisis como programa general completado sin errores.");
+                System.out.println("Representación textual del árbol sintáctico:");
+                System.out.println(tree.toStringTree(parser));
+
+                // Mostrar árbol gráficamente (usa la función que ya tenés)
+                mostrarArbolGrafico(tree, parser);
+
             } catch (Exception ex) {
-                System.out.println("❌ ERROR: El archivo no cumple con la gramática definida.");
+                System.out.println("ERROR: El archivo no cumple con la gramática definida.");
             }
         }
     }

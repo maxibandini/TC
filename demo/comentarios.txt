@@ -1,0 +1,3 @@
+// Esto es un comentario
+int x = 5; /* comentario de bloque */
+y = x + 1;

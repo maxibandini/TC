@@ -1,0 +1,2 @@
+int $hola = 5;
+float valor = 3,14.25;

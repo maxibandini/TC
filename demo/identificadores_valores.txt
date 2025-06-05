@@ -1,0 +1,1 @@
+int resultado = a + b * 10;

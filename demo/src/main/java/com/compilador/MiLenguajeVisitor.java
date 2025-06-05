@@ -73,6 +73,38 @@ public interface MiLenguajeVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitIdentifier(MiLenguajeParser.IdentifierContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code DeclaracionInicializada}
+	 * labeled alternative in {@link MiLenguajeParser#declaracionVariable}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDeclaracionInicializada(MiLenguajeParser.DeclaracionInicializadaContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code DeclaracionSimple}
+	 * labeled alternative in {@link MiLenguajeParser#declaracionVariable}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDeclaracionSimple(MiLenguajeParser.DeclaracionSimpleContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiLenguajeParser#tipo}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTipo(MiLenguajeParser.TipoContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiLenguajeParser#literal}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLiteral(MiLenguajeParser.LiteralContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiLenguajeParser#validacion}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitValidacion(MiLenguajeParser.ValidacionContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link MiLenguajeParser#token}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

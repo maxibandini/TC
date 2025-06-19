@@ -30,34 +30,32 @@ public class App {
         }
 
         try {
-            // Paso 1: Exploración léxica
+            // Paso 1: Léxico
             System.out.println("Procesando fichero: " + args[0]);
             CharStream flujo = CharStreams.fromFileName(args[0]);
-
             List<String> listaErroresLex = new ArrayList<>();
             MiLenguajeLexer lexer = new MiLenguajeLexer(flujo);
             lexer.removeErrorListeners();
             lexer.addErrorListener(new BaseErrorListener() {
                 @Override
-                public void syntaxError(Recognizer<?, ?> recog, Object offendingSymbol,
-                                        int line, int pos, String msg, RecognitionException e) {
+                public void syntaxError(Recognizer<?, ?> r, Object o,
+                        int line, int pos, String msg, RecognitionException e) {
                     listaErroresLex.add("ERROR LÉXICO línea " + line + ", columna " + pos + ": " + msg);
                     throw new ParseCancellationException(msg);
                 }
             });
-
-            CommonTokenStream flujoTokens = new CommonTokenStream(lexer);
-            flujoTokens.fill();
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
+            tokens.fill();
 
             System.out.println("\n=== ETAPA LÉXICA ===");
             if (listaErroresLex.isEmpty()) {
                 System.out.printf("%-18s %-28s %-8s %-8s\n", "CATEGORÍA", "LEXEMA", "LÍNEA", "COL");
                 System.out.println("-------------------------------------------------------");
-                for (Token t : flujoTokens.getTokens()) {
+                for (Token t : tokens.getTokens()) {
                     if (t.getType() != Token.EOF) {
-                        String nombreToken = MiLenguajeLexer.VOCABULARY.getSymbolicName(t.getType());
+                        String name = MiLenguajeLexer.VOCABULARY.getSymbolicName(t.getType());
                         System.out.printf("%-18s %-28s %-8d %-8d\n",
-                                nombreToken, t.getText(), t.getLine(), t.getCharPositionInLine());
+                                name, t.getText(), t.getLine(), t.getCharPositionInLine());
                     }
                 }
                 System.out.println("\n[OK] Etapa léxica completada exitosamente.");
@@ -66,20 +64,20 @@ public class App {
                 return;
             }
 
-            // Paso 2: Estructura sintáctica
-            MiLenguajeParser parser = new MiLenguajeParser(flujoTokens);
+            // Paso 2: Sintaxis
+            MiLenguajeParser parser = new MiLenguajeParser(tokens);
             List<String> listaErroresSin = new ArrayList<>();
             parser.removeErrorListeners();
             parser.addErrorListener(new BaseErrorListener() {
                 @Override
-                public void syntaxError(Recognizer<?, ?> recog, Object offendingSymbol,
-                                        int line, int pos, String msg, RecognitionException e) {
+                public void syntaxError(Recognizer<?, ?> r, Object o,
+                        int line, int pos, String msg, RecognitionException e) {
                     listaErroresSin.add("ERROR SINTÁCTICO línea " + line + ", col " + pos + ": " + msg);
                 }
             });
 
             System.out.println("\n=== ETAPA SINTÁCTICA ===");
-            ParseTree arbol = parser.inicio();  // Ajustar si la regla inicial cambia
+            ParseTree arbol = parser.inicio();
             if (!listaErroresSin.isEmpty()) {
                 listaErroresSin.forEach(System.out::println);
                 return;
@@ -89,47 +87,53 @@ public class App {
                 mostrarArbol(arbol, parser);
             }
 
-            // Paso 3: Validación semántica
+            // Paso 3: Semántica
             SimbolosListener escucha = new SimbolosListener();
-            ParseTreeWalker andador = new ParseTreeWalker();
-            andador.walk(escucha, arbol);
+            ParseTreeWalker walker = new ParseTreeWalker();
+            walker.walk(escucha, arbol);
 
             TablaSimbolos tabla = escucha.getTablaSimbolos();
-            tabla.imprimir();  // Salida de la tabla de símbolos
+            tabla.imprimir();
 
             List<String> errSem = escucha.getErrores();
             List<String> avisos = escucha.getAdvertencias();
-
             if (!errSem.isEmpty()) {
                 System.out.println("\n=== ERRORES SEMÁNTICOS ===");
                 errSem.forEach(System.out::println);
             } else {
                 System.out.println("\n[OK] Etapa semántica completada sin errores.");
             }
-
             if (!avisos.isEmpty()) {
                 System.out.println("\n=== AVISOS ===");
                 avisos.forEach(System.out::println);
             }
+
+            // Paso 4: Generación de código intermedio
+            System.out.println("\n=== GENERACIÓN DE CÓDIGO INTERMEDIO ===");
+            CodigoVisitor codigoVisitor = new CodigoVisitor(tabla);
+            codigoVisitor.visit(arbol);
+
+            GeneradorCodigo gen = codigoVisitor.getGenerador();
+            gen.imprimirCodigo();
+            gen.imprimirEstadisticas();
 
         } catch (IOException ioe) {
             System.err.println("[ERROR] Fallo al cargar el archivo: " + ioe.getMessage());
         } catch (ParseCancellationException pce) {
             System.err.println("[ERROR] Análisis interrumpido: " + pce.getMessage());
         } catch (Exception ex) {
-            System.err.println("[ERROR] Se produjo una excepción inesperada:");
+            System.err.println("[ERROR] Excepción inesperada:");
             ex.printStackTrace();
         }
     }
 
     private static void mostrarArbol(ParseTree arbol, Parser parser) {
         JFrame ventana = new JFrame("Visualizador de Árbol");
-        JPanel contenedor = new JPanel();
+        JPanel cont = new JPanel();
         TreeViewer visor = new TreeViewer(Arrays.asList(parser.getRuleNames()), arbol);
         visor.setScale(1.4);
-        contenedor.add(visor);
-
-        JScrollPane scroll = new JScrollPane(contenedor);
+        cont.add(visor);
+        JScrollPane scroll = new JScrollPane(cont);
         ventana.add(scroll);
         ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         ventana.setSize(800, 600);

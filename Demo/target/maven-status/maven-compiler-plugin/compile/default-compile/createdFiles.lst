@@ -48,6 +48,7 @@ com\compilador\TablaSimbolos$Simbolo.class
 com\compilador\MiLenguajeParser$BucleWhileContext.class
 com\compilador\MiLenguajeParser$ExpIPContext.class
 com\compilador\MiLenguajeParser$IncDecContext.class
+com\compilador\GeneradorCodigo.class
 com\compilador\MiLenguajeVisitor.class
 com\compilador\MiLenguajeBaseListener.class
 com\compilador\MiLenguajeParser$ExpFechaContext.class
@@ -70,4 +71,5 @@ com\compilador\MiLenguajeParser$LlamadaExprContext.class
 com\compilador\MiLenguajeParser$ExpresionContext.class
 com\compilador\MiLenguajeParser$ExpParentesisContext.class
 com\compilador\MiLenguajeParser$ExpDecimalContext.class
+com\compilador\CodigoVisitor.class
 com\compilador\MiLenguajeParser$ParametroContext.class

@@ -1,0 +1,19 @@
+int resta(int p, int q) {
+    return p - q;
+    if (a > 4) {
+        int t;
+    }
+}
+
+void main() {
+    // Aquí metes tu for:
+    for(int j = 0; j < 4; j++){
+        return;
+    }
+
+    int x = 3;
+    int y;
+    int res;
+    y = 7;
+    res = resta(x, y);
+}

@@ -1,0 +1,18 @@
+// Código de tres direcciones generado automáticamente
+// Total instrucciones: 15
+
+  0: func_resta:
+  1: t0 = p - q
+  2: return t0
+  3: func_main:
+  4: L2:
+  5: t2 = j < 4
+  6: if !t2 goto L3
+  7: return
+  8: L3:
+  9: x = 3
+ 10: y = 7
+ 11: param 3
+ 12: param 7
+ 13: t3 = call resta, 2
+ 14: res = t3

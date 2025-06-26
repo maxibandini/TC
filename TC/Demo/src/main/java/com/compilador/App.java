@@ -8,11 +8,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
+import javax.swing.JPanel;
+
+import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
-import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.tree.*;
-import javax.swing.*;
 
 public class App {
     public static final String RESET  = "\u001B[0m";
@@ -38,7 +43,7 @@ public class App {
                     ? inputFileName.substring(0, inputFileName.lastIndexOf('.'))
                     : inputFileName;
 
-            System.out.println(CYAN + "🚀 Iniciando compilación de: " + inputFilePath + RESET);
+            System.out.println(CYAN + "Iniciando compilación de: " + inputFilePath + RESET);
 
             // Fase 1: Léxico
             CharStream input = CharStreams.fromFileName(inputFilePath);
@@ -57,7 +62,7 @@ public class App {
                 lexErrors.forEach(err -> System.out.println(RED + err + RESET));
                 return;
             }
-            System.out.println(GREEN + "✅ Análisis léxico completado" + RESET);
+            System.out.println(GREEN + "Análisis léxico completado" + RESET);
 
             // Fase 2: Sintaxis
             MiLenguajeParser parser = new MiLenguajeParser(tokens);
@@ -74,7 +79,11 @@ public class App {
                 synErrors.forEach(err -> System.out.println(RED + err + RESET));
                 return;
             }
-            System.out.println(GREEN + "✅ Análisis sintáctico completado" + RESET);
+            System.out.println(GREEN + "Análisis sintáctico completado" + RESET);
+
+            // Fase 3: Visualización del AST
+            System.out.println(BLUE + "Visualización del AST" + RESET);
+            mostrarArbol(tree, parser);
 
             // Fase 4: Semántica
             SimbolosListener semListener = new SimbolosListener();
@@ -82,14 +91,12 @@ public class App {
             TablaSimbolos tabla = semListener.getTablaSimbolos();
             List<String> semErrors = semListener.getErrores();
             List<String> semWarnings = semListener.getAdvertencias();
-           if (!semErrors.isEmpty()) {
-                 semErrors.forEach(err -> System.out.println(RED + err + RESET));
-                     System.out.println(YELLOW + "⚠️ Hay errores semánticos, pero procedo a generar los archivos." + RESET);
-                     // ← NO retornamos; seguimos al Fase 5 y 6
-}
-
+            if (!semErrors.isEmpty()) {
+                semErrors.forEach(err -> System.out.println(RED + err + RESET));
+                System.out.println(YELLOW + "Hay errores semánticos, pero procedo a generar los archivos." + RESET);
+            }
             semWarnings.forEach(warn -> System.out.println(YELLOW + warn + RESET));
-            System.out.println(GREEN + "✅ Análisis semántico completado" + RESET);
+            System.out.println(GREEN + "Análisis semántico completado" + RESET);
 
             // Fase 5: Generación de código intermedio
             CodigoVisitor visitor = new CodigoVisitor(tabla);
@@ -99,37 +106,37 @@ public class App {
             gen.imprimirEstadisticas();
 
             // Fase 5b: Optimización
-            System.out.println(CYAN + "\n=== OPTIMIZACIÓN DE CÓDIGO ===" + RESET);
+            System.out.println(CYAN + "=== OPTIMIZACIÓN DE CÓDIGO ===" + RESET);
             Optimizador opt = new Optimizador(gen.getCodigo());
             List<String> codigoOpt = opt.optimizar();
             opt.imprimirCodigoOptimizado();
 
             // Fase 6: Salidas del compilador - guardamos en Demo (salidaDir)
             String codigoIntermedioPath = Paths.get(salidaDir, baseName + "_codigo_intermedio.txt").toString();
-            System.out.println("▶ Guardando intermedio en: " + codigoIntermedioPath);
+            System.out.println("Guardando intermedio en: " + codigoIntermedioPath);
             guardarCodigoEnArchivo(gen.getCodigo(), codigoIntermedioPath);
-            System.out.println(GREEN + "✅ Código intermedio guardado en: " + codigoIntermedioPath + RESET);
+            System.out.println(GREEN + "Código intermedio guardado en: " + codigoIntermedioPath + RESET);
 
             String codigoOptPath = Paths.get(salidaDir, baseName + "_codigo_optimizado.txt").toString();
-            System.out.println("▶ Guardando optimizado en: " + codigoOptPath);
+            System.out.println("Guardando optimizado en: " + codigoOptPath);
             guardarCodigoEnArchivo(codigoOpt, codigoOptPath);
-            System.out.println(GREEN + "✅ Código optimizado guardado en: " + codigoOptPath + RESET);
+            System.out.println(GREEN + "Código optimizado guardado en: " + codigoOptPath + RESET);
 
-            System.out.println(BLUE + "\n=== 6. SALIDAS DEL COMPILADOR ===" + RESET);
-            System.out.println("   📁 Archivo procesado: " + inputFilePath);
-            System.out.println("   🔤 Tokens analizados: " + (tokens.size() - 1));
-            System.out.println("   📊 Símbolos en tabla: " + contarSimbolos(tabla));
-            System.out.println("   📝 Instrucciones generadas: " + gen.getCodigo().size());
-            System.out.println("   📄 Archivo intermedio: " + codigoIntermedioPath);
-            System.out.println("   📄 Archivo optimizado: " + codigoOptPath);
-            System.out.println(GREEN + "\n🎉 ¡COMPILACIÓN COMPLETA! 🎉" + RESET);
+            // Resumen final
+            System.out.println(BLUE + "\n=== SALIDAS DEL COMPILADOR ===" + RESET);
+            System.out.println("Archivo procesado: " + inputFilePath);
+            System.out.println("Tokens analizados: " + (tokens.size() - 1));
+            System.out.println("Símbolos en tabla: " + contarSimbolos(tabla));
+            System.out.println("Instrucciones generadas: " + gen.getCodigo().size());
+            System.out.println("Archivo intermedio: " + codigoIntermedioPath);
+            System.out.println("Archivo optimizado: " + codigoOptPath);
 
         } catch (IOException e) {
-            System.err.println(RED + "❌ Error al leer/escribir archivos: " + e.getMessage() + RESET);
+            System.err.println(RED + "Error al leer/escribir archivos: " + e.getMessage() + RESET);
         } catch (ParseCancellationException e) {
-            System.err.println(RED + "❌ Error de análisis léxico: " + e.getMessage() + RESET);
+            System.err.println(RED + "Error de análisis léxico: " + e.getMessage() + RESET);
         } catch (Exception e) {
-            System.err.println(RED + "❌ Error inesperado:" + RESET);
+            System.err.println(RED + "Error inesperado:" + RESET);
             e.printStackTrace();
         }
     }
@@ -154,13 +161,18 @@ public class App {
     }
 
     private static void mostrarArbol(ParseTree tree, Parser parser) {
-        JFrame frame = new JFrame("Árbol Sintáctico");
-        TreeViewer viewer = new TreeViewer(Arrays.asList(parser.getRuleNames()), tree);
-        viewer.setScale(1.4);
-        JScrollPane scroll = new JScrollPane(viewer);
-        frame.add(scroll);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 600);
-        frame.setVisible(true);
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = new JFrame("Árbol Sintáctico");
+            JPanel panel = new JPanel();
+            TreeViewer viewer = new TreeViewer(Arrays.asList(parser.getRuleNames()), tree);
+            viewer.setScale(1.4);
+            panel.add(viewer);
+            JScrollPane scroll = new JScrollPane(panel);
+            frame.add(scroll);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setSize(800, 600);
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+        });
     }
 }
